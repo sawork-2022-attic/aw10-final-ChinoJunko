@@ -1,0 +1,84 @@
+server:
+  port: 8080  #端口号
+spring:
+  application:
+    name: pos-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: products
+          uri: lb://POS-PRODUCTS
+          predicates:
+            - Path=/products/**
+            # - Method=GET #只能时 GET 请求时，才能访问
+          filters:
+            - PrefixPath=/products-api
+            - name: CircuitBreaker
+              args:
+                name: productsCircuitBreaker
+                fallbackUri: forward:/fallback
+
+        - id: session-test
+          uri: lb://POS-CARTS
+          predicates:
+            - Path=/session/**
+          filters:
+            - PrefixPath=/carts-api
+            - name: CircuitBreaker
+              args:
+                name: cartCircuitBreaker
+                fallbackUri: forward:/fallback
+
+        - id: checkout
+          uri: lb://POS-COUNTER
+          predicates:
+            - Path=/counter/**
+          filters:
+            - PrefixPath=/counter-api
+            - name: CircuitBreaker
+              args:
+                name: cartCircuitBreaker
+                fallbackUri: forward:/fallback
+
+        - id: cart
+          uri: lb://POS-CARTS
+          predicates:
+            - Path=/carts/**
+          filters:
+            - PrefixPath=/carts-api
+            - name: CircuitBreaker
+              args:
+                name: cartCircuitBreaker
+                fallbackUri: forward:/fallback
+
+        - id: order
+          uri: lb://POS-ORDERS
+          predicates:
+            - Path=/orders/**
+          filters:
+            - PrefixPath=/orders-api
+            - name: CircuitBreaker
+              args:
+                name: cartCircuitBreaker
+                fallbackUri: forward:/fallback
+
+#        - id: delivery
+#          uri: lb://POS-DELIVERY
+#          predicates:
+#            - Path=/delivery/**
+#          filters:
+#            - PrefixPath=/delivery-api
+#            - name: CircuitBreaker
+#              args:
+#                name: cartCircuitBreaker
+#                fallbackUri: forward:/fallback
+
+eureka:
+  instance:
+    instance-id: pos-gateway-8080
+  client:
+    fetch-registry: true
+    register-with-eureka: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+

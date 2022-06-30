@@ -1,0 +1,10 @@
+{
+  "simulation": "pos.PosSimulation1",
+  "simulationId": "possimulation1",
+  "start": 1656601662488,
+  "description": "",
+  "scenarios": ["Pos_customer"],
+  "assertions": [
+
+  ]
+}
